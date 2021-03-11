@@ -1,59 +1,47 @@
-my_map = [[0, 1, 0, 1, 1, 1, 0, 0, 0, 0],
-          [1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
-          [0, 0, 0, 0, 1, 1, 0, 1, 1, 1],
-          [0, 1, 1, 0, 1, 0, 1, 1, 1, 1],
-          [0, 0, 0, 0, 1, 1, 1, 0, 0, 0],
-          [1, 0, 1, 0, 1, 1, 0, 0, 0, 0],
-          [1, 1, 1, 1, 1, 0, 0, 0, 1, 1],
-          [1, 1, 1, 0, 1, 1, 0, 0, 0, 1],
-          [0, 1, 0, 1, 0, 1, 1, 0, 1, 1],
-          [0, 0, 0, 0, 1, 1, 1, 0, 0, 0]]
+from collections import deque
+
+row = [-1, -1, -1, 0, 1, 0, 1, 1]
+col = [-1, 1, 0, -1, -1, 1, 0, 1]
 
 
-def number_islands_bfs(graph=my_map):
-    queue = []
-
-    if not graph:
-        return 0
-
-    row_total = len(graph)
-    col_total = len(graph[0])
-
-    count = 0
-
-    for i in range(row_total):
-        for j in range(col_total):
-            if graph[i][j] != 1:
-                continue
-
-            count += 1
-            queue.append((i, j))
-            graph[i][j] = 2
-
-            while queue:
-                x, y = queue.pop()
-
-                if x and graph[x-1][y] == 1:
-                    queue.append((x-1, y))
-                    graph[x-1][y] = 2
-
-                if y and graph[x][y-1] == 1:
-                    queue.append((x, y-1))
-                    graph[x][y-1] = 2
-
-                if x + 1 < row_total and graph[x+1][y] == 1:
-                    queue.append((x+1, y))
-                    graph[x+1][y] = 2
-
-                if y+1 < col_total and graph[x][y+1] == 1:
-                    queue.append((x, y+1))
-                    graph[x][y+1] = 2
-
-    return count
+def is_safe(mat, x, y, processed):
+    return 0 <= x < len(processed) and 0 <= y < len(processed[0]) and mat[x][y] == 1 and not processed[x][y]
 
 
-def number_islands_ucs(graph=my_map):
-    return 0
+def BFS(mat, processed, i, j):
+    q = deque()
+    q.append((i, j))
+    processed[i][j] = True
+
+    while q:
+        x, y = q.popleft()
+
+        for k in range(8):
+            if is_safe(mat, x + row[k], y + col[k], processed):
+                processed[x + row[k]][y + col[k]] = True
+                q.append(([x + row[k], y + col[k]]))
 
 
-print(f"Number of islands is {number_islands_bfs()}")
+if __name__ == "__main__":
+    my_map = [[1, 0, 1, 0, 0, 0, 1, 1, 1, 1],
+              [0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
+              [1, 1, 1, 1, 0, 0, 1, 0, 0, 0],
+              [1, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+              [1, 1, 1, 1, 0, 0, 0, 1, 1, 1],
+              [0, 1, 0, 1, 0, 0, 1, 1, 1, 1],
+              [0, 0, 0, 0, 0, 1, 1, 1, 0, 0],
+              [0, 0, 0, 1, 0, 0, 1, 1, 1, 0],
+              [1, 0, 1, 0, 1, 0, 0, 1, 0, 0],
+              [1, 1, 1, 1, 0, 0, 0, 1, 1, 1]]
+
+    (M, N) = (len(my_map), len(my_map[0]))
+    check = [[False for i in range(N)] for j in range(M)]
+    islands = 0
+
+    for i in range(M):
+        for j in range(N):
+            if my_map[i][j] == 1 and not check[i][j]:
+                BFS(my_map, check, i, j)
+                islands += 1
+
+    print("Tổng số đảo:", islands)
