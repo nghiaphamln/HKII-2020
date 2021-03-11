@@ -180,5 +180,8 @@ def a_star():
 
 
 if __name__ == "__main__":
-    greedy_best_first_search()
+    # print()
+    # greedy_best_first_search()
     a_star()
+    print()
+
